@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+  <head>
+    <script src="/js/jquery-1.12.3.js"></script>
+    <script src="/js/highcharts.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <title>socket.io</title>
+    <style>
+
+    </style>
+    <script>
+      $(document).ready(function() {
+        var socket = io();
+
+        var chartOption = {
+          chart: {
+            type: 'scatter',
+            zoomType: 'xy'
+          },
+          title: {
+            text: 'Socket.io push data'
+          },
+          subtitle: {
+            text: ''
+          },
+          xAxis: {
+            title: {
+              enabled: true,
+              text: ''
+            },
+            startOnTick: true,
+            endOnTick: true,
+            showLastLabel: true
+          },
+          yAxis: {
+            title: {
+              text: ''
+            }
+          },
+          legend: {
+            layout: 'vertical',
+            align: 'left',
+            verticalAlign: 'top',
+            x: 100,
+            y: 70,
+            floating: true,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF',
+            borderWidth: 1,
+            enabled: false
+          },
+          plotOptions: {
+            scatter: {
+              marker: {
+                radius: 5,
+                  states: {
+                    hover: {
+                      enabled: true,
+                        lineColor: 'rgb(100,100,100)'
+                    }
+                  }
+                },
+                states: {
+                  hover: {
+                    marker: {
+                      enabled: false
+                    }
+                  }
+                },
+                tooltip: {
+                  headerFormat: '<b>{series.name}</b><br>',
+                  pointFormat: '{point.x} cm, {point.y} kg'
+              }
+            }
+          },
+          series: [{
+            name: 'Data',
+            color: 'rgba(223, 83, 83, .5)',
+            data: []
+          }]
+        };
+        $('#container').highcharts(chartOption);
+
+        var chart = $('#container').highcharts();
+        console.log(chart.series[0].data);
+        //update
+
+        $('#start').on('click', function() {
+          socket.emit('send', '1');
+        });
+
+        socket.on('server', function(data) {
+          console.log(data);
+          //var dataArr = [];
+          //dataArr.push(161.2, 42.3);
+          chart.series[0].addPoint(data);
+          //$('#messages').append($('<li>').text(data));
+        });
+
+      });
+    </script>
+  </head>
+  <body>
+    <input id="start" type="button" value="START" />
+    <div id="container" style="width:400px; height:300px;"></div>
+  </body>
+</html>
